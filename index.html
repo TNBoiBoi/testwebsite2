@@ -148,13 +148,108 @@
             font-size: 0.875rem;
             color: #666;
         }
+		.menu-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 10;
+            cursor: pointer;
+            font-size: 2rem;
+        }
+
+        .nav-menu {
+            position: fixed;
+            top: 0;
+            left: -250px;
+            height: 100vh;
+            width: 250px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            transition: 0.3s;
+            z-index: 9;
+            padding-top: 80px;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+
+        .nav-menu.active {
+            left: 0;
+        }
+
+        .nav-item {
+            padding: 15px 25px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .nav-item:hover {
+            background: #f3f4f6;
+        }
+
+        .page {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .page.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        /* Styles for Free Hugs page */
+        .hug-button {
+            padding: 20px 40px;
+            font-size: 1.5rem;
+            background: #ff6b00;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .hug-button:hover {
+            transform: scale(1.1);
+        }
+
+        .heart {
+            position: fixed;
+            font-size: 1.5rem;
+            pointer-events: none;
+            animation: float 2s ease-out forwards;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) scale(0);
+                opacity: 0;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="background-pattern">
-        <!-- Background items will be inserted here via JS -->
-    </div>
+    <div class="menu-btn">☰</div>
+	
+	<nav class="nav-menu">
+        <div class="nav-item" data-page="converter">Converter</div>
+        <div class="nav-item" data-page="hugs">Free Hugs</div>
+    </nav>
 
+    <!-- Converter Page -->
+    <div class="page active" id="converter-page">
+        <div class="background-pattern">
+            <!-- Background items will be inserted here via JS -->
+        </div>
     <div class="converter-card">
         <h1 class="title">🔑 Or Ozery's Converter 🍔</h1>
         
@@ -180,8 +275,13 @@
         <div class="helper-text">
             Need a quick conversion? Just enter the amount in Israeli Shekels above!
         </div>
+	</div>
+	
+	
     </div>
-
+<div class="page" id="hugs-page">
+        <button class="hug-button">Click for a Free Hug! 🤗</button>
+    </div>
     <script>
         // Create and update background
         const backgroundPattern = document.querySelector('.background-pattern');
@@ -265,6 +365,62 @@
 
         ilsInput.addEventListener('input', (e) => {
             updateResult(e.target.value);
+        });
+		const menuBtn = document.querySelector('.menu-btn');
+        const navMenu = document.querySelector('.nav-menu');
+        const pages = document.querySelectorAll('.page');
+
+        menuBtn.addEventListener('click', () => {
+            navMenu.classList.toggle('active');
+        });
+
+        // Page Navigation
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const pageId = item.getAttribute('data-page');
+                pages.forEach(page => {
+                    page.classList.remove('active');
+                });
+                document.getElementById(`${pageId}-page`).classList.add('active');
+                navMenu.classList.remove('active');
+            });
+        });
+
+        // Heart Animation
+        const hugButton = document.querySelector('.hug-button');
+        
+        function createHeart(x, y) {
+            const heart = document.createElement('div');
+            heart.classList.add('heart');
+            heart.textContent = '❤️';
+            heart.style.left = `${x}px`;
+            heart.style.top = `${y}px`;
+            document.body.appendChild(heart);
+            
+            // Remove heart after animation
+            setTimeout(() => {
+                heart.remove();
+            }, 2000);
+        }
+
+        hugButton.addEventListener('click', (e) => {
+            // Create multiple hearts
+            for (let i = 0; i < 12; i++) {
+                setTimeout(() => {
+                    const offsetX = (Math.random() - 0.5) * 100;
+                    const offsetY = (Math.random() - 0.5) * 100;
+                    createHeart(
+                        e.clientX + offsetX, 
+                        e.clientY + offsetY
+                    );
+                }, i * 50);
+            }
+            
+            // Show hug message
+            hugButton.textContent = "1 Free Hug Given! 🤗";
+            setTimeout(() => {
+                hugButton.textContent = "Click for a Free Hug! 🤗";
+            }, 2000);
         });
     </script>
 </body>
